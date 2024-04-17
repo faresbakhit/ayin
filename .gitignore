@@ -1,0 +1,8 @@
+# Build files
+target/
+
+# Visual Studio Code
+.vscode/
+
+# JetBrains IDE
+.idea/
