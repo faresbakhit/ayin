@@ -12,10 +12,15 @@
 
 1. Install [MSYS2](https://www.msys2.org/)
 2. Open `MSYS2 UCRT64`
-3. Install [gcc](https://gcc.gnu.org/) a C/C++ Compiler, [SDL2](https://www.libsdl.org/) the window handling library, and [FeeType](https://freetype.org/) the font renderer:
-4. Build (debug build by default)
+3. Install dependencies:
 ```
 $ pacman -S --needed base-devel mingw-w64-ucrt-x86_64-toolchain mingw-w64-ucrt-x86_64-SDL2 mingw-w64-ucrt-x86_64-freetype
+```
+5. Build
+```
+$ cd /path/to/ayin/
+$ make mode=release
+$ ./target/release/ayin.exe
 ```
 
 ### Configure MSYS2 UCRT64 for VSCode
