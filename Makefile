@@ -22,17 +22,17 @@ endif
 
 exe := $(BUILDDIR)/ayin
 
-AYIN_SOURCES = src/Application.cpp src/Commands.cpp src/Image.cpp src/ImageFilter.cpp src/Photo.cpp src/Main.cpp
+INTERNAL_SOURCES = src/Application.cpp src/Commands.cpp src/Image.cpp src/ImageFilter.cpp src/Photo.cpp src/Main.cpp
 # for `make format`
-AYIN_HEADERS = src/Application.hpp src/Commands.hpp src/Image.hpp src/ImageFilter.hpp src/Photo.hpp src/utils/win32.hpp
+INTERNAL_HEADERS = src/Application.hpp src/Commands.hpp src/Image.hpp src/ImageFilter.hpp src/Photo.hpp src/utils/win32.hpp
 
-EXTERN_SOURCES = lib/imgui/imgui.cpp lib/imgui/imgui_draw.cpp lib/imgui/imgui_tables.cpp lib/imgui/imgui_widgets.cpp # ImGui
-EXTERN_SOURCES += lib/imgui/misc/freetype/imgui_freetype.cpp # ImGui FreeType
-EXTERN_SOURCES += lib/imgui/backends/imgui_impl_sdl2.cpp lib/imgui/backends/imgui_impl_opengl3.cpp # ImGui (SDL2 + OpenGL3) Backend
-EXTERN_SOURCES += lib/portable-file-dialogs/portable-file-dialogs.cpp # Portable File Dialogs
+EXTERNAL_SOURCES = lib/imgui/imgui.cpp lib/imgui/imgui_draw.cpp lib/imgui/imgui_tables.cpp lib/imgui/imgui_widgets.cpp # ImGui
+EXTERNAL_SOURCES += lib/imgui/misc/freetype/imgui_freetype.cpp # ImGui FreeType
+EXTERNAL_SOURCES += lib/imgui/backends/imgui_impl_sdl2.cpp lib/imgui/backends/imgui_impl_opengl3.cpp # ImGui (SDL2 + OpenGL3) Backend
+EXTERNAL_SOURCES += lib/portable-file-dialogs/portable-file-dialogs.cpp # Portable File Dialogs
 
-AYIN_OBJECTS = $(addprefix $(BUILDDIR)/ayin/, $(addsuffix .o, $(basename $(notdir $(AYIN_SOURCES)))))
-EXTERN_OBJECTS = $(addprefix $(BUILDDIR)/extern/, $(addsuffix .o, $(basename $(notdir $(EXTERN_SOURCES)))))
+INTERNAL_OBJECTS = $(addprefix $(BUILDDIR)/internal/, $(addsuffix .o, $(basename $(notdir $(INTERNAL_SOURCES)))))
+EXTERNAL_OBJECTS = $(addprefix $(BUILDDIR)/external/, $(addsuffix .o, $(basename $(notdir $(EXTERNAL_SOURCES)))))
 
 ifeq ($(OS),Windows_NT)
  exe := $(exe).exe
@@ -43,35 +43,40 @@ ifeq ($(OS),Windows_NT)
   LDFLAGS += -static `pkg-config --static --libs sdl2 freetype2`
  endif
  CXXFLAGS += `pkg-config --cflags sdl2 freetype2`
- AYIN_OBJECTS += $(BUILDDIR)/ayin/icon.o
+ INTERNAL_OBJECTS += $(BUILDDIR)/internal/icon.o
 else
- $(error unsupported platform: $(mode))
+ ifeq ($(shell uname),Linux)
+  LDFLAGS += -lGL `pkg-config --libs sdl2 freetype2`
+  CXXFLAGS += `pkg-config --cflags sdl2 freetype2`
+ else
+  $(error unsupported platform: $(mode))
+ endif
 endif
 
-$(exe): $(BUILDDIR) $(AYIN_OBJECTS) $(EXTERN_OBJECTS)
+$(exe): $(INTERNAL_OBJECTS) $(EXTERNAL_OBJECTS)
 	$(CXX) -o $@ $^ $(LDFLAGS)
 
 $(BUILDDIR):
-	mkdir -p $(BUILDDIR)/ayin $(BUILDDIR)/extern
+	mkdir -p $(BUILDDIR)/internal $(BUILDDIR)/external
 
-$(BUILDDIR)/ayin/%.o:src/%.cpp
+$(BUILDDIR)/internal/%.o:src/%.cpp|$(BUILDDIR)
 	$(CXX) -c -o $@ $< $(CXXFLAGS)
 
 ifeq ($(OS),Windows_NT)
-$(BUILDDIR)/ayin/icon.o:misc/icon/icon.rc
+$(BUILDDIR)/internal/icon.o:misc/icon/icon.rc
 	windres $^ $@
 endif
 
-$(BUILDDIR)/extern/%.o:lib/portable-file-dialogs/%.cpp
+$(BUILDDIR)/external/%.o:lib/portable-file-dialogs/%.cpp
 	$(CXX) -c -o $@ $< $(CXXFLAGS)
 
-$(BUILDDIR)/extern/%.o:lib/imgui/%.cpp
+$(BUILDDIR)/external/%.o:lib/imgui/%.cpp
 	$(CXX) -c -o $@ $< $(CXXFLAGS)
 
-$(BUILDDIR)/extern/%.o:lib/imgui/backends/%.cpp
+$(BUILDDIR)/external/%.o:lib/imgui/backends/%.cpp
 	$(CXX) -c -o $@ $< $(CXXFLAGS)
 
-$(BUILDDIR)/extern/%.o:lib/imgui/misc/freetype/%.cpp
+$(BUILDDIR)/external/%.o:lib/imgui/misc/freetype/%.cpp
 	$(CXX) -c -o $@ $< $(CXXFLAGS)
 
 .PHONY: all format clean clean-ayin clean-extern
@@ -79,12 +84,12 @@ $(BUILDDIR)/extern/%.o:lib/imgui/misc/freetype/%.cpp
 all: $(BUILDDIR) $(exe)
 
 format:
-	clang-format -i $(AYIN_SOURCES) $(AYIN_HEADERS)
+	clang-format -i $(INTERNAL_SOURCES) $(INTERNAL_HEADERS)
 
 clean: clean-ayin clean-extern
 
 clean-ayin:
-	$(RM) $(exe) $(AYIN_OBJECTS)
+	$(RM) $(exe) $(INTERNAL_OBJECTS)
 
 clean-extern:
-	$(RM) $(exe) $(EXTERN_OBJECTS)
+	$(RM) $(exe) $(EXTERNAL_OBJECTS)
