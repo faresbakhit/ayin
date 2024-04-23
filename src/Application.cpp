@@ -124,7 +124,7 @@ bool Application::init(const char *title) {
 #ifdef _WIN32
 	windows_theme_timer_id = SDL_AddTimer(0, sdl_timer_callback, sdl_window);
 #else
-	ImGui::StyleColorsDark(style);
+	ImGui::StyleColorsDark();
 #endif
 
 	return true;
@@ -149,6 +149,14 @@ void Application::new_frame() {
 	ImGui::NewFrame();
 }
 
+Photo* Application::get_selected_photo() {
+	return photos[m_selectedPhotoIndex].get();
+}
+
+void Application::set_selected_photo(size_t index) {
+	m_selectedPhotoIndex = std::clamp(index, (size_t)0, (size_t)(photos.size() - 1));
+}
+
 void Application::open_file_dialog() {
 	auto selection = pfd::OpenFile("Open", "", pfdImageFile, pfd::Option::multiselect).result();
 	for (auto it = selection.begin(); it != selection.end(); ++it) {
@@ -159,7 +167,7 @@ void Application::open_file_dialog() {
 		image->load(it->c_str());
 		image->load_texture();
 
-		auto pred = [&](Photo *photo) { return photo->filename == name + name_suffix.str(); };
+		auto pred = [&](std::unique_ptr<Photo>& photo) { return photo->filename == name + name_suffix.str(); };
 
 		while (std::find_if(photos.begin(), photos.end(), pred) != photos.end()) {
 			name_suffix.str("");
@@ -210,7 +218,8 @@ InputRequest Application::handle_input() {
 				if (event.key.keysym.sym == SDLK_o) {
 					open_file_dialog();
 				} else if (event.key.keysym.sym == SDLK_w) {
-					return InputRequest(InputRequest_CloseTab);
+					photos.erase(photos.begin() + m_selectedPhotoIndex);
+					if (m_selectedPhotoIndex > 0) m_selectedPhotoIndex -= 1;
 				} else if (event.key.keysym.mod & KMOD_SHIFT && (event.key.keysym.sym == SDLK_s)) {
 					return InputRequest(InputRequest_SaveAs);
 				} else if (event.key.keysym.sym == SDLK_s) {
@@ -225,8 +234,6 @@ InputRequest Application::handle_input() {
 					zoomin = true;
 				} else if (event.key.keysym.sym == SDLK_MINUS) {
 					zoomout = true;
-				} else if (event.key.keysym.sym >= SDLK_1 && event.key.keysym.sym <= SDLK_9) {
-					return InputRequest(InputRequest_SwitchTab, event.key.keysym.sym - SDLK_0);
 				}
 			}
 			break;

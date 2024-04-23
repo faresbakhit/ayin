@@ -55,19 +55,20 @@ int main(int, char **) {
 			continue;
 		}
 
-		Photo *photo;
+		Photo* photo = app.get_selected_photo();
 		ImGui::SetNextWindowSize(ImVec2(app.io->DisplaySize.x * 4.0f / 5.0f, (app.io->DisplaySize.y - 23.0f)));
 		ImGui::SetNextWindowPos(ImVec2(app.io->DisplaySize.x - app.io->DisplaySize.x * 4.0f / 5.0f, 23.0f));
 		if (ImGui::Begin("Photos", NULL, window_flags)) {
 			if (ImGui::BeginTabBar("Photos Tab Bar", tabbar_flags)) {
-				int i = 1;
-				for (auto it = app.photos.begin(); it != app.photos.end(); ++it) {
-					auto tab_flags = ImGuiTabItemFlags_None;
-					if (input_req.ty == InputRequest_SwitchTab && input_req.tab_number == i++ && !cmd) {
-						tab_flags = ImGuiTabItemFlags_SetSelected;
-					}
-					if (ImGui::BeginTabItem((*it)->filename.c_str(), NULL, tab_flags)) {
-						// photo = *it;
+				size_t i = 0;
+				for (auto it = app.photos.begin(); it != app.photos.end(); ++it, ++i) {
+					int flags = (photo->can_undo_change() && (photo->filename) == (*it)->filename) ?
+								ImGuiTabItemFlags_UnsavedDocument : ImGuiTabItemFlags_None;
+					if (ImGui::BeginTabItem((*it)->filename.c_str(), NULL, flags)) {
+						if ((photo->filename) != (*it)->filename) {
+							app.set_selected_photo(i);
+							photo = app.get_selected_photo();
+						}
 						if (ImGui::BeginChild("Image")) {
 							ImVec2 cursor_pos = ImGui::GetCursorPos();
 							ImVec2 content_region = ImGui::GetContentRegionAvail();
@@ -164,13 +165,6 @@ int main(int, char **) {
 			photo->undo_change();
 		} else if (input_req.ty == InputRequest_Redo && photo->can_redo_change()) {
 			photo->redo_change();
-		} else if (input_req.ty == InputRequest_CloseTab) {
-			for (auto it = app.photos.begin(); it != app.photos.end(); ++it) {
-				if ((*it)->filename == photo->filename) {
-					app.photos.erase(it);
-					break;
-				}
-			}
 		}
 
 		app.render();

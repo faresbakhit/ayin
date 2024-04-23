@@ -6,6 +6,7 @@
 
 #include <string>
 #include <vector>
+#include <memory>
 
 #include <SDL.h>
 #include <imgui.h>
@@ -27,8 +28,6 @@ const std::vector<std::string> pfdImageFile = {"All Picture Files (*.bmp;*.jpg;*
 enum InputRequest_ {
 	InputRequest_ZoomIn,
 	InputRequest_ZoomOut,
-	InputRequest_SwitchTab,
-	InputRequest_CloseTab,
 	InputRequest_Save,
 	InputRequest_SaveAs,
 	InputRequest_Undo,
@@ -47,9 +46,7 @@ struct InputRequest {
 
 class Application {
   public:
-	typedef std::vector<std::unique_ptr<Photo>> photos_type;
-	photos_type photos;
-	photos_type::size_type selected_photo;
+	std::vector<std::unique_ptr<Photo>> photos;
 
 	ImGuiIO *io = nullptr;
 	bool done = false;
@@ -57,6 +54,8 @@ class Application {
 	~Application();
 	bool init(const char *title);
 	void new_frame();
+	Photo* get_selected_photo();
+	void set_selected_photo(size_t index);
 	void open_file_dialog();
 	void save_file_dialog(Photo &photo);
 	void render();
@@ -68,5 +67,6 @@ class Application {
 #ifdef _WIN32
 	SDL_TimerID windows_theme_timer_id = 0;
 #endif
+	size_t m_selectedPhotoIndex = 0;
 };
 } // namespace ayin
