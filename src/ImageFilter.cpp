@@ -62,8 +62,7 @@ void ImageFilter::Rotate(Image &image) {
 	std::swap(image.width, image.height);
 }
 
-void ImageFilter::DrawRectangle(Image &image, int x, int y, int width,
-								int height, int thickness,
+void ImageFilter::DrawRectangle(Image &image, int x, int y, int width, int height, int thickness,
 								unsigned char *color) {
 	for (int i = 0; i < width; ++i) {
 		for (int j = 0; j < thickness; ++j) {
@@ -83,8 +82,7 @@ void ImageFilter::DrawRectangle(Image &image, int x, int y, int width,
 	}
 }
 
-static void DrawFilledRectangle(Image &image, int x, int y, int width,
-								int height, unsigned char *color) {
+static void DrawFilledRectangle(Image &image, int x, int y, int width, int height, unsigned char *color) {
 	for (int i = 0; i < width; ++i) {
 		for (int j = 0; j < height; ++j) {
 			for (int k = 0; k < 3; ++k) {
@@ -118,16 +116,14 @@ void ImageFilter::Frame(Image &image, int fanciness, unsigned int pcolor) {
 	DrawRectangle(image, outer_frame_thickness, outer_frame_thickness, // x, y
 				  image.width - 2 * outer_frame_thickness,			   // width
 				  image.height - 2 * outer_frame_thickness,			   // height
-				  inner_frame_thickness, // thickness
+				  inner_frame_thickness,							   // thickness
 				  white);
 
 	DrawRectangle(image, outer_frame_thickness + 2 * inner_frame_thickness,
-				  outer_frame_thickness + 2 * inner_frame_thickness, // x, y
-				  image.width - 2 * outer_frame_thickness -
-					  4 * inner_frame_thickness, // width
-				  image.height - 2 * outer_frame_thickness -
-					  4 * inner_frame_thickness, // height
-				  inner_inner_frame_thickness,	 // thickness
+				  outer_frame_thickness + 2 * inner_frame_thickness,					// x, y
+				  image.width - 2 * outer_frame_thickness - 4 * inner_frame_thickness,	// width
+				  image.height - 2 * outer_frame_thickness - 4 * inner_frame_thickness, // height
+				  inner_inner_frame_thickness,											// thickness
 				  white);
 
 	if (fanciness <= 2) {
@@ -136,49 +132,38 @@ void ImageFilter::Frame(Image &image, int fanciness, unsigned int pcolor) {
 
 	for (int i = 0; i < 2; ++i) {
 		for (int j = 0; j < 2; ++j) {
+			DrawFilledRectangle(image,
+								(1 - 2 * i) * (outer_frame_thickness + 2 * inner_frame_thickness) +
+									i * (image.width - outer_frame_box_width), // x
+								(1 - 2 * j) * (outer_frame_thickness + 2 * inner_frame_thickness) +
+									j * (image.height - outer_frame_box_width), // y
+								outer_frame_box_width,
+								outer_frame_box_width, // width, height
+								white);
+			DrawRectangle(image,
+						  (1 - 2 * i) * (outer_frame_thickness + 2 * inner_frame_thickness) +
+							  i * (image.width - 2.4 * outer_frame_box_width), // x
+						  (1 - 2 * j) * (outer_frame_thickness + 2 * inner_frame_thickness) +
+							  j * (image.height - 2.4 * outer_frame_box_width), // y
+						  2.4 * outer_frame_box_width,							// width
+						  2.4 * outer_frame_box_width,							// height
+						  inner_frame_thickness,								// thickness
+						  white);
+			DrawRectangle(image,
+						  (1 - 2 * i) * (outer_frame_thickness + 2 * inner_frame_thickness) +
+							  i * (image.width - 1.7 * outer_frame_box_width), // x
+						  (1 - 2 * j) * (outer_frame_thickness + 2 * inner_frame_thickness) +
+							  j * (image.height - 1.7 * outer_frame_box_width), // y
+						  1.7 * outer_frame_box_width,							// width
+						  1.7 * outer_frame_box_width,							// height
+						  inner_inner_frame_thickness / 2,						// thickness
+						  white);
 			DrawFilledRectangle(
 				image,
-				(1 - 2 * i) *
-						(outer_frame_thickness + 2 * inner_frame_thickness) +
-					i * (image.width - outer_frame_box_width), // x
-				(1 - 2 * j) *
-						(outer_frame_thickness + 2 * inner_frame_thickness) +
-					j * (image.height - outer_frame_box_width), // y
-				outer_frame_box_width,
-				outer_frame_box_width, // width, height
-				white);
-			DrawRectangle(
-				image,
-				(1 - 2 * i) *
-						(outer_frame_thickness + 2 * inner_frame_thickness) +
-					i * (image.width - 2.4 * outer_frame_box_width), // x
-				(1 - 2 * j) *
-						(outer_frame_thickness + 2 * inner_frame_thickness) +
-					j * (image.height - 2.4 * outer_frame_box_width), // y
-				2.4 * outer_frame_box_width,						  // width
-				2.4 * outer_frame_box_width,						  // height
-				inner_frame_thickness, // thickness
-				white);
-			DrawRectangle(
-				image,
-				(1 - 2 * i) *
-						(outer_frame_thickness + 2 * inner_frame_thickness) +
-					i * (image.width - 1.7 * outer_frame_box_width), // x
-				(1 - 2 * j) *
-						(outer_frame_thickness + 2 * inner_frame_thickness) +
-					j * (image.height - 1.7 * outer_frame_box_width), // y
-				1.7 * outer_frame_box_width,						  // width
-				1.7 * outer_frame_box_width,						  // height
-				inner_inner_frame_thickness / 2, // thickness
-				white);
-			DrawFilledRectangle(
-				image,
-				i * ((1 - 2 * j) * outer_frame_thickness +
-					 j * (image.width - inner_frame_thickness)), // x
-				!i * ((1 - 2 * j) * (outer_frame_thickness) +
-					  j * (image.height - inner_frame_thickness)), // y
-				i * inner_frame_thickness + !i * image.width,	   // width
-				i * image.height + !i * inner_frame_thickness,	   // height
+				i * ((1 - 2 * j) * outer_frame_thickness + j * (image.width - inner_frame_thickness)),	   // x
+				!i * ((1 - 2 * j) * (outer_frame_thickness) + j * (image.height - inner_frame_thickness)), // y
+				i * inner_frame_thickness + !i * image.width,											   // width
+				i * image.height + !i * inner_frame_thickness,											   // height
 				white);
 		}
 	}
@@ -252,19 +237,15 @@ void ImageFilter::Resize(Image &image, int w, int h) {
 	Image result(w, h, image.channels);
 	bool w_bigger = w > image.width;
 	bool h_bigger = h > image.height;
-	float ratio_w = w_bigger ? (float)image.width / (float)w
-							 : (float)w / (float)image.width;
-	float ratio_h = h_bigger ? (float)image.height / (float)h
-							 : (float)h / (float)image.height;
+	float ratio_w = w_bigger ? (float)image.width / (float)w : (float)w / (float)image.width;
+	float ratio_h = h_bigger ? (float)image.height / (float)h : (float)h / (float)image.height;
 	float end_w = w_bigger ? w : image.width;
 	float end_h = h_bigger ? h : image.height;
 	for (int i = 0; i < end_w; i++) {
 		for (int j = 0; j < end_h; j++) {
 			for (int c = 0; c < 3; c++) {
-				result(w_bigger ? i : (int)floor(i * ratio_w),
-					   h_bigger ? j : (int)floor(j * ratio_h), c) =
-					image(w_bigger ? (int)floor(i * ratio_w) : i,
-						  h_bigger ? (int)floor(j * ratio_h) : j, c);
+				result(w_bigger ? i : (int)floor(i * ratio_w), h_bigger ? j : (int)floor(j * ratio_h), c) =
+					image(w_bigger ? (int)floor(i * ratio_w) : i, h_bigger ? (int)floor(j * ratio_h) : j, c);
 			}
 		}
 	}
@@ -305,14 +286,11 @@ void ImageFilter::DetectEdges(Image &image) {
 			int x_gradient = 0, y_gradient = 0;
 			for (int j = -1; j <= 1; j++) {
 				for (int i = -1; i <= 1; i++) {
-					x_gradient +=
-						sobel_x[j + 1][i + 1] * image(x + i, y + j, 0);
-					y_gradient +=
-						sobel_y[j + 1][i + 1] * image(x + i, y + j, 0);
+					x_gradient += sobel_x[j + 1][i + 1] * image(x + i, y + j, 0);
+					y_gradient += sobel_y[j + 1][i + 1] * image(x + i, y + j, 0);
 				}
 			}
-			int magnitude = static_cast<int>(
-				sqrt(x_gradient * x_gradient + y_gradient * y_gradient));
+			int magnitude = static_cast<int>(sqrt(x_gradient * x_gradient + y_gradient * y_gradient));
 			magnitude = std::max(0, std::min(255, magnitude));
 			for (int c = 0; c < 3; ++c) {
 				edges(x, y, c) = magnitude;
@@ -357,25 +335,15 @@ void ImageFilter::Sunlight(Image &image) {
 }
 
 void ImageFilter::OilPaint(Image &image) {
-	int intensityCount[AYIN_IMAGEFILTER_OILPAINT_INTENSITY]{},
-		averageR[AYIN_IMAGEFILTER_OILPAINT_INTENSITY]{},
-		averageG[AYIN_IMAGEFILTER_OILPAINT_INTENSITY]{},
-		averageB[AYIN_IMAGEFILTER_OILPAINT_INTENSITY]{};
+	int intensityCount[AYIN_IMAGEFILTER_OILPAINT_INTENSITY]{}, averageR[AYIN_IMAGEFILTER_OILPAINT_INTENSITY]{},
+		averageG[AYIN_IMAGEFILTER_OILPAINT_INTENSITY]{}, averageB[AYIN_IMAGEFILTER_OILPAINT_INTENSITY]{};
 	Image oil_image(image.width, image.height, image.channels);
-	for (int i = AYIN_IMAGEFILTER_OILPAINT_RADIUS;
-		 i < image.width - AYIN_IMAGEFILTER_OILPAINT_RADIUS; ++i) {
-		for (int j = AYIN_IMAGEFILTER_OILPAINT_RADIUS;
-			 j < image.height - AYIN_IMAGEFILTER_OILPAINT_RADIUS; ++j) {
-			for (int m = -AYIN_IMAGEFILTER_OILPAINT_RADIUS;
-				 m <= AYIN_IMAGEFILTER_OILPAINT_RADIUS; ++m) {
-				for (int n = -AYIN_IMAGEFILTER_OILPAINT_RADIUS;
-					 n <= AYIN_IMAGEFILTER_OILPAINT_RADIUS; ++n) {
-					int r = image(i + m, j + n, 0), g = image(i + m, j + n, 1),
-						b = image(i + m, j + n, 2);
-					int curIntensity =
-						(int)((double)((r + g + b) / 3) *
-							  AYIN_IMAGEFILTER_OILPAINT_INTENSITY) /
-						255.0f;
+	for (int i = AYIN_IMAGEFILTER_OILPAINT_RADIUS; i < image.width - AYIN_IMAGEFILTER_OILPAINT_RADIUS; ++i) {
+		for (int j = AYIN_IMAGEFILTER_OILPAINT_RADIUS; j < image.height - AYIN_IMAGEFILTER_OILPAINT_RADIUS; ++j) {
+			for (int m = -AYIN_IMAGEFILTER_OILPAINT_RADIUS; m <= AYIN_IMAGEFILTER_OILPAINT_RADIUS; ++m) {
+				for (int n = -AYIN_IMAGEFILTER_OILPAINT_RADIUS; n <= AYIN_IMAGEFILTER_OILPAINT_RADIUS; ++n) {
+					int r = image(i + m, j + n, 0), g = image(i + m, j + n, 1), b = image(i + m, j + n, 2);
+					int curIntensity = (int)((double)((r + g + b) / 3) * AYIN_IMAGEFILTER_OILPAINT_INTENSITY) / 255.0f;
 					intensityCount[curIntensity]++;
 					averageR[curIntensity] += r;
 					averageG[curIntensity] += g;
@@ -405,11 +373,9 @@ void ImageFilter::OilPaint(Image &image) {
 void ImageFilter::Purple(Image &image) {
 	for (int i = 0; i < image.width; ++i) {
 		for (int j = 0; j < image.height; ++j) {
-			image(i, j, 0) =
-				std::clamp((int)((float)image(i, j, 0) * 1.25f), 0, 255);
+			image(i, j, 0) = std::clamp((int)((float)image(i, j, 0) * 1.25f), 0, 255);
 			image(i, j, 1) = (int)((float)image(i, j, 1) * 0.5f);
-			image(i, j, 2) =
-				std::clamp((int)((float)image(i, j, 2) * 1.25f), 0, 255);
+			image(i, j, 2) = std::clamp((int)((float)image(i, j, 2) * 1.25f), 0, 255);
 		}
 	}
 }
@@ -428,15 +394,12 @@ void ImageFilter::Infrared(Image &image) {
 void ImageFilter::Skew(Image &image, int angle) {
 	bool neg = angle < 0;
 	double tangent = std::tan(std::abs(angle) * M_PI / 180.0);
-	Image skew_image(image.width + image.height * tangent, image.height,
-					 image.channels);
+	Image skew_image(image.width + image.height * tangent, image.height, image.channels);
 
 	for (int i = 0; i < image.width; i++) {
 		for (int j = 0; j < image.height; j++) {
 			for (int k = 0; k < 3; k++) {
-				skew_image(i + (neg * image.height + (1 - 2 * neg) * j) *
-								   tangent,
-						   j, k) = image(i, j, k);
+				skew_image(i + (neg * image.height + (1 - 2 * neg) * j) * tangent, j, k) = image(i, j, k);
 			}
 		}
 	}
@@ -485,10 +448,8 @@ void ImageFilter::Emboss(Image &image) {
 	for (int i = 3; i < image.width - 3; ++i) {
 		for (int j = 3; j < image.height - 3; ++j) {
 			for (int k = 0; k < image.channels; ++k) {
-				sum = image(i, j - 1, k) * -1 + 128 +
-					  image(i - 1, j - 1, k) * -1 + 128 +
-					  image(i - 1, j, k) * -1 + 128 + image(i, j + 1, k) + 128 +
-					  image(i + 1, j + 1, k) + 128 + image(i + 1, j, k) + 128;
+				sum = image(i, j - 1, k) * -1 + 128 + image(i - 1, j - 1, k) * -1 + 128 + image(i - 1, j, k) * -1 +
+					  128 + image(i, j + 1, k) + 128 + image(i + 1, j + 1, k) + 128 + image(i + 1, j, k) + 128;
 				emboss_image(i, j, k) = std::clamp(sum / 6, 0, 255);
 			}
 		}

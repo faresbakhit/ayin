@@ -246,37 +246,20 @@ class Emboss : public Base {
 };
 
 inline extern const char *const names[]{
-	"Grayscale",  "Black and White",	"Invert",
-	"Merge",	  "Flip Horizontally",	"Flip Vertically",
-	"Rotate",	  "Darken and Lighten", "Crop",
-	"Frame",	  "Detect Edges",		"Resize",
-	"Blur",		  "Sunlight",			"Oil Paint",
-	"Purple",	  "Infrared",			"Skew",
+	"Grayscale",  "Black and White",	"Invert",	 "Merge",  "Flip Horizontally", "Flip Vertically",
+	"Rotate",	  "Darken and Lighten", "Crop",		 "Frame",  "Detect Edges",		"Resize",
+	"Blur",		  "Sunlight",			"Oil Paint", "Purple", "Infrared",			"Skew",
 	"3D Glasses", "Motion Blur",		"Emboss",
 };
 
 inline extern const std::function<Base *()> factory[]{
-	[]() { return new Grayscale(); },
-	[]() { return new BlackAndWhite(); },
-	[]() { return new Invert(); },
-	[]() { return new Merge(); },
-	[]() { return new FlipHorizontally(); },
-	[]() { return new FlipVertically(); },
-	[]() { return new Rotate(); },
-	[]() { return new DarkenAndLighten(); },
-	[]() { return new Crop(); },
-	[]() { return new Frame(); },
-	[]() { return new DetectEdges(); },
-	[]() { return new Resize(); },
-	[]() { return new Blur(); },
-	[]() { return new Sunlight(); },
-	[]() { return new OilPaint(); },
-	[]() { return new Purple(); },
-	[]() { return new Infrared(); },
-	[]() { return new Skew(); },
-	[]() { return new Glasses3D(); },
-	[]() { return new MotionBlur(); },
-	[]() { return new Emboss(); },
+	[]() { return new Grayscale(); }, []() { return new BlackAndWhite(); },	   []() { return new Invert(); },
+	[]() { return new Merge(); },	  []() { return new FlipHorizontally(); }, []() { return new FlipVertically(); },
+	[]() { return new Rotate(); },	 []() { return new DarkenAndLighten(); }, []() { return new Crop(); },
+	[]() { return new Frame(); },	  []() { return new DetectEdges(); },		 []() { return new Resize(); },
+	[]() { return new Blur(); },	   []() { return new Sunlight(); },		 []() { return new OilPaint(); },
+	[]() { return new Purple(); },	 []() { return new Infrared(); },		   []() { return new Skew(); },
+	[]() { return new Glasses3D(); }, []() { return new MotionBlur(); },		  []() { return new Emboss(); },
 };
 
 inline extern const int number = std::size(names);

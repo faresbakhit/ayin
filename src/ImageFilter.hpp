@@ -18,8 +18,7 @@ void Merge(Image &image1, Image &image2);
 void FlipHorizontally(Image &image);
 void FlipVertically(Image &image);
 void Rotate(Image &image);
-void DrawRectangle(Image &image, int x, int y, int width, int height,
-				   int thickness, unsigned char *color);
+void DrawRectangle(Image &image, int x, int y, int width, int height, int thickness, unsigned char *color);
 void Frame(Image &image, int fanciness, unsigned int color);
 void Crop(Image &image, int x, int y, int w, int h);
 void Resize(Image &image, int w, int h);

@@ -21,9 +21,8 @@
 
 namespace ayin {
 
-const std::vector<std::string> pfdImageFile = {
-	"All Picture Files (*.bmp;*.jpg;*.jpeg;*.png;*.psd)",
-	"*.bmp *.dib *.jpg *.jpeg *.jpe *.jfif *.gif *.png *.psd"};
+const std::vector<std::string> pfdImageFile = {"All Picture Files (*.bmp;*.jpg;*.jpeg;*.png;*.psd)",
+											   "*.bmp *.dib *.jpg *.jpeg *.jpe *.jfif *.gif *.png *.psd"};
 
 enum InputRequest_ {
 	InputRequest_ZoomIn,
@@ -43,14 +42,16 @@ struct InputRequest {
 		int tab_number;
 	};
 	InputRequest(InputRequest_ ty) : ty(ty) {}
-	InputRequest(InputRequest_ ty, int tab_number)
-		: ty(ty), tab_number(tab_number) {}
+	InputRequest(InputRequest_ ty, int tab_number) : ty(ty), tab_number(tab_number) {}
 };
 
 class Application {
   public:
+	typedef std::vector<std::unique_ptr<Photo>> photos_type;
+	photos_type photos;
+	photos_type::size_type selected_photo;
+
 	ImGuiIO *io = nullptr;
-	std::vector<Photo *> photos;
 	bool done = false;
 	Application() = default;
 	~Application();

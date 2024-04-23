@@ -40,8 +40,7 @@ change:
 	SDL_VERSION(&wmInfo.version);
 	SDL_GetWindowWMInfo((SDL_Window *)sdl_window, &wmInfo);
 	BOOL USE_DARK_MODE = !is_light;
-	DwmSetWindowAttribute((HWND)wmInfo.info.win.window,
-						  DWMWINDOWATTRIBUTE::DWMWA_USE_IMMERSIVE_DARK_MODE,
+	DwmSetWindowAttribute((HWND)wmInfo.info.win.window, DWMWINDOWATTRIBUTE::DWMWA_USE_IMMERSIVE_DARK_MODE,
 						  &USE_DARK_MODE, sizeof(USE_DARK_MODE));
 	return 5000;
 }
@@ -63,19 +62,16 @@ bool Application::init(const char *title) {
 #elif defined(__APPLE__)
 	// GL 3.2 Core + GLSL 150
 	const char *glsl_version = "#version 150";
-	SDL_GL_SetAttribute(
-		SDL_GL_CONTEXT_FLAGS,
-		SDL_GL_CONTEXT_FORWARD_COMPATIBLE_FLAG); // Always required on Mac
-	SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK,
-						SDL_GL_CONTEXT_PROFILE_CORE);
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS,
+						SDL_GL_CONTEXT_FORWARD_COMPATIBLE_FLAG); // Always required on Mac
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
 #else
 	// GL 3.0 + GLSL 130
 	const char *glsl_version = "#version 130";
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, 0);
-	SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK,
-						SDL_GL_CONTEXT_PROFILE_CORE);
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
 #endif
@@ -88,10 +84,9 @@ bool Application::init(const char *title) {
 	SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
 	SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
 	SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);
-	sdl_window = SDL_CreateWindow(
-		title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 1280, 720,
-		SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE | SDL_WINDOW_MAXIMIZED |
-			SDL_WINDOW_ALLOW_HIGHDPI);
+	sdl_window =
+		SDL_CreateWindow(title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 1280, 720,
+						 SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE | SDL_WINDOW_MAXIMIZED | SDL_WINDOW_ALLOW_HIGHDPI);
 
 	if (sdl_window == nullptr) {
 		return false;
@@ -116,17 +111,15 @@ bool Application::init(const char *title) {
 	ImGui_ImplOpenGL3_Init(glsl_version);
 
 	const float font_size = 18.0f;
-	io->Fonts->AddFontFromMemoryCompressedTTF(
-		OpenSansFont_compressed_data, OpenSansFont_compressed_size, font_size);
+	io->Fonts->AddFontFromMemoryCompressedTTF(OpenSansFont_compressed_data, OpenSansFont_compressed_size, font_size);
 	static const ImWchar icons_ranges[] = {ICON_MIN_MD, ICON_MAX_16_MD, 0};
 	ImFontConfig icons_config;
 	icons_config.MergeMode = true;
 	icons_config.PixelSnapH = true;
 	icons_config.GlyphMinAdvanceX = font_size * 2.0f / 3.0f; // font size (px)
-	io->Fonts->AddFontFromMemoryCompressedTTF(
-		MaterialIconsFont_compressed_data, MaterialIconsFont_compressed_size,
-		icons_config.GlyphMinAdvanceX, // font size (px)
-		&icons_config, icons_ranges);
+	io->Fonts->AddFontFromMemoryCompressedTTF(MaterialIconsFont_compressed_data, MaterialIconsFont_compressed_size,
+											  icons_config.GlyphMinAdvanceX, // font size (px)
+											  &icons_config, icons_ranges);
 
 #ifdef _WIN32
 	windows_theme_timer_id = SDL_AddTimer(0, sdl_timer_callback, sdl_window);
@@ -138,12 +131,6 @@ bool Application::init(const char *title) {
 }
 
 Application::~Application() {
-	for (auto &&ph : photos) {
-		delete ph->image;
-		delete ph->origImage;
-		delete ph;
-	}
-
 	ImGui_ImplOpenGL3_Shutdown();
 	ImGui_ImplSDL2_Shutdown();
 	ImGui::DestroyContext(NULL);
@@ -163,9 +150,7 @@ void Application::new_frame() {
 }
 
 void Application::open_file_dialog() {
-	auto selection =
-		pfd::OpenFile("Open", "", pfdImageFile, pfd::Option::multiselect)
-			.result();
+	auto selection = pfd::OpenFile("Open", "", pfdImageFile, pfd::Option::multiselect).result();
 	for (auto it = selection.begin(); it != selection.end(); ++it) {
 		Image *image = new Image();
 		std::string name = std::filesystem::path(*it).filename().string();
@@ -174,34 +159,27 @@ void Application::open_file_dialog() {
 		image->load(it->c_str());
 		image->load_texture();
 
-		auto pred = [&](Photo *photo) {
-			return photo->filename == name + name_suffix.str();
-		};
+		auto pred = [&](Photo *photo) { return photo->filename == name + name_suffix.str(); };
 
-		while (std::find_if(photos.begin(), photos.end(), pred) !=
-			   photos.end()) {
+		while (std::find_if(photos.begin(), photos.end(), pred) != photos.end()) {
 			name_suffix.str("");
 			name_suffix << " (" << name_suffix_i++ << ")";
 		}
 
-		Image *origImage =
-			new Image(image->width, image->height, image->channels);
-		memcpy(origImage->data, image->data,
-			   image->width * image->height * image->channels);
+		Image *origImage = new Image(image->width, image->height, image->channels);
+		memcpy(origImage->data, image->data, image->width * image->height * image->channels);
 
-		Photo *photo = new Photo;
+		std::unique_ptr<Photo> photo = std::make_unique<Photo>();
 		photo->image = image;
 		photo->origImage = origImage;
 		photo->filename = name + name_suffix.str();
 		photo->filepath = *it;
-		photos.push_back(photo);
+		photos.push_back(std::move(photo));
 	}
 }
 
 void Application::save_file_dialog(Photo &photo) {
-	auto selection =
-		pfd::SaveFile("Save As...", "", pfdImageFile, pfd::Option::none)
-			.result();
+	auto selection = pfd::SaveFile("Save As...", "", pfdImageFile, pfd::Option::none).result();
 	if (selection.empty()) {
 		return;
 	}
@@ -223,20 +201,17 @@ InputRequest Application::handle_input() {
 			break;
 		case SDL_KEYDOWN:
 			if (event.key.keysym.sym == SDLK_F11) {
-				if ((window_flags & SDL_WINDOW_FULLSCREEN_DESKTOP) ==
-					SDL_WINDOW_FULLSCREEN_DESKTOP) {
+				if ((window_flags & SDL_WINDOW_FULLSCREEN_DESKTOP) == SDL_WINDOW_FULLSCREEN_DESKTOP) {
 					SDL_SetWindowFullscreen(sdl_window, 0);
 				} else {
-					SDL_SetWindowFullscreen(sdl_window,
-											SDL_WINDOW_FULLSCREEN_DESKTOP);
+					SDL_SetWindowFullscreen(sdl_window, SDL_WINDOW_FULLSCREEN_DESKTOP);
 				}
 			} else if (event.key.keysym.mod & KMOD_CTRL) {
 				if (event.key.keysym.sym == SDLK_o) {
 					open_file_dialog();
 				} else if (event.key.keysym.sym == SDLK_w) {
 					return InputRequest(InputRequest_CloseTab);
-				} else if (event.key.keysym.mod & KMOD_SHIFT &&
-						   (event.key.keysym.sym == SDLK_s)) {
+				} else if (event.key.keysym.mod & KMOD_SHIFT && (event.key.keysym.sym == SDLK_s)) {
 					return InputRequest(InputRequest_SaveAs);
 				} else if (event.key.keysym.sym == SDLK_s) {
 					return InputRequest(InputRequest_Save);
@@ -250,10 +225,8 @@ InputRequest Application::handle_input() {
 					zoomin = true;
 				} else if (event.key.keysym.sym == SDLK_MINUS) {
 					zoomout = true;
-				} else if (event.key.keysym.sym >= SDLK_1 &&
-						   event.key.keysym.sym <= SDLK_9) {
-					return InputRequest(InputRequest_SwitchTab,
-										event.key.keysym.sym - SDLK_0);
+				} else if (event.key.keysym.sym >= SDLK_1 && event.key.keysym.sym <= SDLK_9) {
+					return InputRequest(InputRequest_SwitchTab, event.key.keysym.sym - SDLK_0);
 				}
 			}
 			break;
@@ -286,8 +259,8 @@ void Application::render() {
 	ImGui::Render();
 	glViewport(0, 0, (int)io->DisplaySize.x, (int)io->DisplaySize.y);
 	ImVec4 clear_color = ImGui::GetStyleColorVec4(ImGuiCol_PopupBg);
-	glClearColor(clear_color.x * clear_color.w, clear_color.y * clear_color.w,
-				 clear_color.z * clear_color.w, clear_color.w);
+	glClearColor(clear_color.x * clear_color.w, clear_color.y * clear_color.w, clear_color.z * clear_color.w,
+				 clear_color.w);
 	glClear(GL_COLOR_BUFFER_BIT);
 	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 	SDL_GL_SwapWindow(sdl_window);

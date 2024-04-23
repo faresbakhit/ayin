@@ -9,8 +9,7 @@
 
 using namespace ayin;
 
-Image::Image(int width, int height, int channels)
-	: width(width), height(height), channels(channels) {
+Image::Image(int width, int height, int channels) : width(width), height(height), channels(channels) {
 	data = (unsigned char *)malloc(width * height * channels);
 }
 
@@ -47,8 +46,7 @@ bool Image::save(const char *filename) {
 		return stbi_write_bmp(filename, width, height, STBI_rgb, data);
 	} else if (strcmp(extension, ".tga") == 0) {
 		return stbi_write_tga(filename, width, height, STBI_rgb, data);
-	} else if (strcmp(extension, ".jpg") == 0 ||
-			   strcmp(extension, ".jpeg") == 0) {
+	} else if (strcmp(extension, ".jpg") == 0 || strcmp(extension, ".jpeg") == 0) {
 		return stbi_write_jpg(filename, width, height, STBI_rgb, data, 90);
 	}
 
@@ -68,22 +66,16 @@ void Image::load_texture() {
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-	glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format,
-				 GL_UNSIGNED_BYTE, data);
+	glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
 }
 
 void Image::update_texture() const {
 	GLint format = channels == 3 ? GL_RGB : GL_RGBA;
 	glBindTexture(GL_TEXTURE_2D, texture);
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-	glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, width, height, format,
-					GL_UNSIGNED_BYTE, data);
+	glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, width, height, format, GL_UNSIGNED_BYTE, data);
 }
 
-unsigned char &Image::operator()(int x, int y, int c) {
-	return data[(y * width + x) * channels + c];
-}
+unsigned char &Image::operator()(int x, int y, int c) { return data[(y * width + x) * channels + c]; }
 
-const unsigned char &Image::operator()(int x, int y, int c) const {
-	return data[(y * width + x) * channels + c];
-}
+const unsigned char &Image::operator()(int x, int y, int c) const { return data[(y * width + x) * channels + c]; }

@@ -34,8 +34,7 @@ static void doCommand(Image &image, Commands::Info cmd) {
 		ImageFilter::ChangeBrightness(image, cmd.darkenlighten_factor);
 		break;
 	case Commands::Type_Crop:
-		ImageFilter::Crop(image, cmd.crop_x, cmd.crop_y, cmd.crop_width,
-						  cmd.crop_height);
+		ImageFilter::Crop(image, cmd.crop_x, cmd.crop_y, cmd.crop_width, cmd.crop_height);
 		break;
 	case Commands::Type_Frame:
 		ImageFilter::Frame(image, cmd.frame_fanciness, cmd.frame_color);
@@ -77,16 +76,13 @@ static void doCommand(Image &image, Commands::Info cmd) {
 }
 
 void Photo::reset() {
-	bool newDataSize =
-		image->width != origImage->width || image->height != origImage->height;
+	bool newDataSize = image->width != origImage->width || image->height != origImage->height;
 	if (newDataSize) {
 		newDataSize = true;
 		delete image;
-		image =
-			new Image(origImage->width, origImage->height, origImage->channels);
+		image = new Image(origImage->width, origImage->height, origImage->channels);
 	}
-	memcpy(image->data, origImage->data,
-		   origImage->width * origImage->height * origImage->channels);
+	memcpy(image->data, origImage->data, origImage->width * origImage->height * origImage->channels);
 	if (newDataSize) {
 		image->load_texture();
 	} else {
@@ -112,17 +108,14 @@ void Photo::push_change(Commands::Info info) {
 void Photo::undo_change() {
 	++m_undoPos;
 
-	bool newDataSize =
-		image->width != origImage->width || image->height != origImage->height;
+	bool newDataSize = image->width != origImage->width || image->height != origImage->height;
 	if (newDataSize) {
 		newDataSize = true;
 		delete image;
-		image =
-			new Image(origImage->width, origImage->height, origImage->channels);
+		image = new Image(origImage->width, origImage->height, origImage->channels);
 	}
 
-	memcpy(image->data, origImage->data,
-		   origImage->width * origImage->height * origImage->channels);
+	memcpy(image->data, origImage->data, origImage->width * origImage->height * origImage->channels);
 
 	for (size_t i = 0; i < m_undoStack.size() - m_undoPos; ++i) {
 		doCommand(*image, m_undoStack[i]);
@@ -135,9 +128,7 @@ void Photo::undo_change() {
 	}
 }
 
-bool Photo::can_undo_change() {
-	return m_undoPos <= (int)m_undoStack.size() - 1;
-}
+bool Photo::can_undo_change() { return m_undoPos <= (int)m_undoStack.size() - 1; }
 
 void Photo::redo_change() {
 	--m_undoPos;
