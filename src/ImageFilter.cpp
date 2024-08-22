@@ -1,6 +1,5 @@
 #include <algorithm>
 #include <cstring>
-#include <limits>
 #define _USE_MATH_DEFINES
 #include <cmath>
 
@@ -343,7 +342,7 @@ void ImageFilter::OilPaint(Image &image) {
 			for (int m = -AYIN_IMAGEFILTER_OILPAINT_RADIUS; m <= AYIN_IMAGEFILTER_OILPAINT_RADIUS; ++m) {
 				for (int n = -AYIN_IMAGEFILTER_OILPAINT_RADIUS; n <= AYIN_IMAGEFILTER_OILPAINT_RADIUS; ++n) {
 					int r = image(i + m, j + n, 0), g = image(i + m, j + n, 1), b = image(i + m, j + n, 2);
-					int curIntensity = (int)((double)((r + g + b) / 3) * AYIN_IMAGEFILTER_OILPAINT_INTENSITY) / 255.0f;
+					int curIntensity = (int)((((double)(r + g + b) / 3) * AYIN_IMAGEFILTER_OILPAINT_INTENSITY) / 255.0);
 					intensityCount[curIntensity]++;
 					averageR[curIntensity] += r;
 					averageG[curIntensity] += g;
@@ -396,6 +395,7 @@ void ImageFilter::Skew(Image &image, int angle) {
 	double tangent = std::tan(std::abs(angle) * M_PI / 180.0);
 	Image skew_image(image.width + image.height * tangent, image.height, image.channels);
 
+	skew_image.clear();
 	for (int i = 0; i < image.width; i++) {
 		for (int j = 0; j < image.height; j++) {
 			for (int k = 0; k < 3; k++) {

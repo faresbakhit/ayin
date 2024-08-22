@@ -3,8 +3,9 @@
 #include "Image.hpp"
 #include "fonts/MaterialIcons.hpp"
 
-#include <cmath>
-#include <filesystem>
+#include <cstdio>
+#include <cstdlib>
+#include <exception>
 #include <vector>
 
 using namespace ayin;
@@ -14,10 +15,13 @@ const ImGuiWindowFlags window_flags =
 
 const ImGuiTabBarFlags tabbar_flags = ImGuiTabBarFlags_AutoSelectNewTabs | ImGuiTabBarFlags_FittingPolicyScroll;
 
-int main(int, char **) {
+int main(int argc, char *argv[]) try {
 	Commands::Base *cmd = nullptr;
-	Application app;
-	app.init("Ayin");
+	Application app("Ayin");
+
+	for (int i = 1; i < argc; i++) {
+		app.add_photo(argv[i]);
+	}
 
 	while (!app.done) {
 		InputRequest input_req = app.handle_input();
@@ -55,21 +59,22 @@ int main(int, char **) {
 			continue;
 		}
 
-		Photo* photo = app.get_selected_photo();
+		Photo *photo = app.get_selected_photo();
 		ImGui::SetNextWindowSize(ImVec2(app.io->DisplaySize.x * 4.0f / 5.0f, (app.io->DisplaySize.y - 23.0f)));
 		ImGui::SetNextWindowPos(ImVec2(app.io->DisplaySize.x - app.io->DisplaySize.x * 4.0f / 5.0f, 23.0f));
-		if (ImGui::Begin("Photos", NULL, window_flags)) {
-			if (ImGui::BeginTabBar("Photos Tab Bar", tabbar_flags)) {
+		if (ImGui::Begin("Display", NULL, window_flags)) {
+			if (ImGui::BeginTabBar("PhotosTabBar", tabbar_flags)) {
 				size_t i = 0;
 				for (auto it = app.photos.begin(); it != app.photos.end(); ++it, ++i) {
-					int flags = (photo->can_undo_change() && (photo->filename) == (*it)->filename) ?
-								ImGuiTabItemFlags_UnsavedDocument : ImGuiTabItemFlags_None;
-					if (ImGui::BeginTabItem((*it)->filename.c_str(), NULL, flags)) {
-						if ((photo->filename) != (*it)->filename) {
+					int flags = (photo->can_undo_change() && (photo->name) == (*it)->name)
+									? ImGuiTabItemFlags_UnsavedDocument
+									: ImGuiTabItemFlags_None;
+					if (ImGui::BeginTabItem((*it)->name.c_str(), NULL, flags)) {
+						if ((photo->name) != (*it)->name) {
 							app.set_selected_photo(i);
 							photo = app.get_selected_photo();
 						}
-						if (ImGui::BeginChild("Image")) {
+						if (ImGui::BeginChild("PhotoPreview")) {
 							ImVec2 cursor_pos = ImGui::GetCursorPos();
 							ImVec2 content_region = ImGui::GetContentRegionAvail();
 							ImVec2 content_pos = ImGui::GetWindowPos();
@@ -136,7 +141,6 @@ int main(int, char **) {
 				}
 				ImGui::EndDisabled();
 				ImGui::Text("Filters");
-				// Filters buttons
 				for (size_t i = 0; i < Commands::number; i++) {
 					if (ImGui::Button(Commands::names[i], button_size)) {
 						cmd = Commands::factory[i]();
@@ -174,4 +178,7 @@ int main(int, char **) {
 		delete cmd;
 	}
 	return EXIT_SUCCESS;
+} catch (const std::exception& exc) {
+	fprintf(stderr, "[ERROR] %s", exc.what());
+	return EXIT_FAILURE;
 }

@@ -1,10 +1,7 @@
 #pragma once
 
-#include <vector>
-
 namespace ayin {
-class Image {
-  public:
+struct Image {
 	int width = 0;
 	int height = 0;
 	int channels = 0;
@@ -12,9 +9,11 @@ class Image {
 	unsigned int texture = 0;
 
 	Image() = default;
+	Image(const Image &);
 	Image(int width, int height, int channels);
 	~Image();
 
+	void clear();
 	bool load(const char *filename);
 	bool save(const char *filename);
 

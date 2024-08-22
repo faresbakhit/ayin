@@ -1,24 +1,22 @@
 #pragma once
 
-#include "Commands.hpp"
-#include "Image.hpp"
 #include "Photo.hpp"
 
+#include <memory>
 #include <string>
 #include <vector>
-#include <memory>
 
-#include <SDL.h>
+#include <SDL2/SDL.h>
 #include <imgui.h>
 #include <imgui_impl_opengl3.h>
 #include <imgui_impl_opengl3_loader.h>
 #include <imgui_impl_sdl2.h>
 #if defined(IMGUI_IMPL_OPENGL_ES2)
-#include <SDL_opengles2.h>
+#include <SDL2/SDL_opengles2.h>
 #else
-#include <SDL_opengl.h>
+#include <SDL2/SDL_opengl.h>
 #endif
-#include <SDL_opengl.h>
+#include <SDL2/SDL_opengl.h>
 
 namespace ayin {
 
@@ -45,28 +43,25 @@ struct InputRequest {
 };
 
 class Application {
-  public:
+public:
 	std::vector<std::unique_ptr<Photo>> photos;
-
 	ImGuiIO *io = nullptr;
 	bool done = false;
-	Application() = default;
+
+	Application(const std::string &title);
 	~Application();
-	bool init(const char *title);
 	void new_frame();
-	Photo* get_selected_photo();
+	void add_photo(const std::string &filepath);
+	Photo *get_selected_photo();
 	void set_selected_photo(size_t index);
 	void open_file_dialog();
 	void save_file_dialog(Photo &photo);
 	void render();
 	InputRequest handle_input();
 
-  private:
+private:
 	SDL_GLContext gl_context = nullptr;
 	SDL_Window *sdl_window = nullptr;
-#ifdef _WIN32
-	SDL_TimerID windows_theme_timer_id = 0;
-#endif
 	size_t m_selectedPhotoIndex = 0;
 };
 } // namespace ayin

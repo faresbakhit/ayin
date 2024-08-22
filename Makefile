@@ -5,7 +5,7 @@ CXXFLAGS += -std=c++17 -Wall -Wextra -Wno-missing-field-initializers -Wno-missin
 
 ifeq ($(mode),debug)
  BUILDDIR = target/debug
- CXXFLAGS += -g -O0
+ CXXFLAGS += -O1
 else
  ifeq ($(mode),release)
   BUILDDIR = target/release

@@ -59,7 +59,7 @@ struct Info {
 };
 
 class Base {
-  public:
+public:
 	bool done = false;
 	Image *image = nullptr;
 	Image *tmpImage = nullptr;
@@ -67,125 +67,125 @@ class Base {
 	virtual ~Base();
 	virtual void setImage(Image &image) = 0;
 	virtual bool hasOptionsMenu() { return false; };
-	virtual void showOptionsMenu() {};
+	virtual void showOptionsMenu(){};
 	virtual Info getInfo() = 0;
 };
 
 class Grayscale : public Base {
-  public:
+public:
 	void setImage(Image &) override;
 	Info getInfo() override;
 };
 
 class BlackAndWhite : public Base {
-  public:
+public:
 	void setImage(Image &) override;
 	Info getInfo() override;
 };
 
 class Invert : public Base {
-  public:
+public:
 	void setImage(Image &) override;
 	Info getInfo() override;
 };
 
 class Merge : public Base {
-  public:
+public:
 	void setImage(Image &) override;
 	Info getInfo() override;
 
-  private:
+private:
 	const char *m_mergeImageFilename;
 };
 
 class FlipHorizontally : public Base {
-  public:
+public:
 	void setImage(Image &) override;
 	Info getInfo() override;
 };
 
 class FlipVertically : public Base {
-  public:
+public:
 	void setImage(Image &) override;
 	Info getInfo() override;
 };
 
 class Rotate : public Base {
-  public:
+public:
 	void setImage(Image &) override;
 	Info getInfo() override;
 };
 
 class DarkenAndLighten : public Base {
-  public:
+public:
 	void setImage(Image &) override;
 	bool hasOptionsMenu() override;
 	void showOptionsMenu() override;
 	Info getInfo() override;
 
-  private:
+private:
 	int factor = 100;
 };
 
 class Crop : public Base {
-  public:
+public:
 	void setImage(Image &) override;
 	bool hasOptionsMenu() override;
 	void showOptionsMenu() override;
 	Info getInfo() override;
 
-  private:
+private:
 	int m_x, m_y, m_width, m_height;
 };
 
 class Frame : public Base {
-  public:
+public:
 	void setImage(Image &) override;
 	bool hasOptionsMenu() override;
 	void showOptionsMenu() override;
 	Info getInfo() override;
 
-  private:
+private:
 	int fanciness = 1;
 	ImVec4 color{1.0f, 1.0f, 1.0f, 1.0f};
 };
 
 class DetectEdges : public Base {
-  public:
+public:
 	void setImage(Image &) override;
 	Info getInfo() override;
 };
 
 class Resize : public Base {
-  public:
+public:
 	void setImage(Image &) override;
 	bool hasOptionsMenu() override;
 	void showOptionsMenu() override;
 	Info getInfo() override;
 
-  private:
+private:
 	int m_width, m_height;
 };
 
 class Blur : public Base {
-  public:
+public:
 	void setImage(Image &) override;
 	bool hasOptionsMenu() override;
 	void showOptionsMenu() override;
 	Info getInfo() override;
 
-  private:
+private:
 	int m_blurLevel = 5;
 };
 
 class Sunlight : public Base {
-  public:
+public:
 	void setImage(Image &) override;
 	Info getInfo() override;
 };
 
 class OilPaint : public Base {
-  public:
+public:
 	void setImage(Image &) override;
 	Info getInfo() override;
 };
@@ -195,52 +195,52 @@ class OilPaint : public Base {
 // };
 
 class Purple : public Base {
-  public:
+public:
 	void setImage(Image &) override;
 	Info getInfo() override;
 };
 
 class Infrared : public Base {
-  public:
+public:
 	void setImage(Image &) override;
 	Info getInfo() override;
 };
 
 class Skew : public Base {
-  public:
+public:
 	void setImage(Image &) override;
 	bool hasOptionsMenu() override;
 	void showOptionsMenu() override;
 	Info getInfo() override;
 
-  private:
+private:
 	int m_skewAngle = 45;
 };
 
 class Glasses3D : public Base {
-  public:
+public:
 	void setImage(Image &) override;
 	bool hasOptionsMenu() override;
 	void showOptionsMenu() override;
 	Info getInfo() override;
 
-  private:
+private:
 	int intensity;
 };
 
 class MotionBlur : public Base {
-  public:
+public:
 	void setImage(Image &) override;
 	bool hasOptionsMenu() override;
 	void showOptionsMenu() override;
 	Info getInfo() override;
 
-  private:
+private:
 	int m_blurLevel;
 };
 
 class Emboss : public Base {
-  public:
+public:
 	void setImage(Image &) override;
 	Info getInfo() override;
 };

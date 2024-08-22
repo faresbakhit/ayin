@@ -7,10 +7,10 @@
 
 namespace ayin {
 class Photo {
-  public:
+public:
 	Image *image = nullptr;
 	Image *origImage = nullptr;
-	std::string filename{};
+	std::string name{};
 	std::string filepath{};
 	float x = 0.0f, y = 0.0f, zoom = 1.0f;
 
@@ -23,7 +23,7 @@ class Photo {
 	void redo_change();
 	bool can_redo_change();
 
-  private:
+private:
 	std::vector<Commands::Info> m_undoStack{};
 	int m_undoPos = 0;
 };

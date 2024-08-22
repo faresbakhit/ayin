@@ -5,4 +5,6 @@ IndentWidth: 4
 UseTab: Always
 LineEnding: LF
 ColumnLimit: 120
+IndentAccessModifiers: false
+AccessModifierOffset: -4
 ...

@@ -1,54 +1,22 @@
 #include "Application.hpp"
-#include "ImageFilter.hpp"
 #include "fonts/MaterialIcons.hpp"
 #include "fonts/MaterialIconsFont.hpp"
 #include "fonts/OpenSansFont.hpp"
+#ifdef _WIN32
 #include "utils/win32.hpp"
+#endif
 
 #include <algorithm>
 #include <filesystem>
+#include <stdexcept>
 
-#include <SDL_syswm.h>
 #include <portable-file-dialogs.hpp>
 
 using namespace ayin;
 
-#ifdef _WIN32
-static Uint32 sdl_timer_callback(Uint32, void *sdl_window) {
-	static int is_light = -1;
-	switch (is_light) {
-	case -1: // init
-		is_light = utils::win32::use_light_theme();
-		goto change;
-	case 0: // false
-		if (utils::win32::use_light_theme()) {
-			is_light = true;
-			goto change;
-		}
-		break;
-	case 1: // true
-		if (!utils::win32::use_light_theme()) {
-			is_light = false;
-			goto change;
-		}
-		break;
-	}
-	return 5000;
-change:
-	is_light ? ImGui::StyleColorsLight() : ImGui::StyleColorsDark();
-	SDL_SysWMinfo wmInfo;
-	SDL_VERSION(&wmInfo.version);
-	SDL_GetWindowWMInfo((SDL_Window *)sdl_window, &wmInfo);
-	BOOL USE_DARK_MODE = !is_light;
-	DwmSetWindowAttribute((HWND)wmInfo.info.win.window, DWMWINDOWATTRIBUTE::DWMWA_USE_IMMERSIVE_DARK_MODE,
-						  &USE_DARK_MODE, sizeof(USE_DARK_MODE));
-	return 5000;
-}
-#endif
-
-bool Application::init(const char *title) {
+Application::Application(const std::string &title) {
 	if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER) < 0) {
-		return false;
+		throw std::runtime_error(SDL_GetError());
 	}
 
 	// Decide GL+GLSL versions
@@ -85,19 +53,19 @@ bool Application::init(const char *title) {
 	SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
 	SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);
 	sdl_window =
-		SDL_CreateWindow(title, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 1280, 720,
+		SDL_CreateWindow(title.c_str(), SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 1280, 720,
 						 SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE | SDL_WINDOW_MAXIMIZED | SDL_WINDOW_ALLOW_HIGHDPI);
 
 	if (sdl_window == nullptr) {
-		return false;
+		throw std::runtime_error(SDL_GetError());
 	}
 
 	gl_context = SDL_GL_CreateContext(sdl_window);
 	if (gl_context == NULL) {
-		return false;
+		throw std::runtime_error(SDL_GetError());
 	}
 	if (SDL_GL_MakeCurrent(sdl_window, gl_context) < 0) {
-		return false;
+		throw std::runtime_error(SDL_GetError());
 	};
 	SDL_GL_SetSwapInterval(1);
 
@@ -122,12 +90,10 @@ bool Application::init(const char *title) {
 											  &icons_config, icons_ranges);
 
 #ifdef _WIN32
-	windows_theme_timer_id = SDL_AddTimer(0, sdl_timer_callback, sdl_window);
+	SDL_AddTimer(0, utils::win32::AutoImGuiStyleColorsSDLTimerCallback, sdl_window);
 #else
 	ImGui::StyleColorsDark();
 #endif
-
-	return true;
 }
 
 Application::~Application() {
@@ -135,9 +101,6 @@ Application::~Application() {
 	ImGui_ImplSDL2_Shutdown();
 	ImGui::DestroyContext(NULL);
 
-#ifdef _WIN32
-	SDL_RemoveTimer(windows_theme_timer_id);
-#endif
 	SDL_GL_DeleteContext(gl_context);
 	SDL_DestroyWindow(sdl_window);
 	SDL_Quit();
@@ -149,9 +112,31 @@ void Application::new_frame() {
 	ImGui::NewFrame();
 }
 
-Photo* Application::get_selected_photo() {
-	return photos[m_selectedPhotoIndex].get();
+void Application::add_photo(const std::string &filepath) {
+	Image *image = new Image();
+	std::string name = std::filesystem::path(filepath).filename().string();
+	std::ostringstream name_suffix;
+
+	auto pred = [&](std::unique_ptr<Photo> &photo) { return photo->name == name + name_suffix.str(); };
+	int name_suffix_i = 1;
+	while (std::find_if(photos.begin(), photos.end(), pred) != photos.end()) {
+		name_suffix.str("");
+		name_suffix << " (" << name_suffix_i++ << ")";
+	}
+
+	image->load(filepath.c_str());
+	image->load_texture();
+
+	std::unique_ptr<Photo> photo = std::make_unique<Photo>();
+	photo->image = image;
+	photo->origImage = new Image(*image);
+	photo->name = name + name_suffix.str();
+	photo->filepath = filepath;
+
+	photos.push_back(std::move(photo));
 }
+
+Photo *Application::get_selected_photo() { return photos[m_selectedPhotoIndex].get(); }
 
 void Application::set_selected_photo(size_t index) {
 	m_selectedPhotoIndex = std::clamp(index, (size_t)0, (size_t)(photos.size() - 1));
@@ -160,29 +145,8 @@ void Application::set_selected_photo(size_t index) {
 void Application::open_file_dialog() {
 	auto selection = pfd::OpenFile("Open", "", pfdImageFile, pfd::Option::multiselect).result();
 	for (auto it = selection.begin(); it != selection.end(); ++it) {
-		Image *image = new Image();
-		std::string name = std::filesystem::path(*it).filename().string();
-		std::ostringstream name_suffix{};
-		int name_suffix_i = 1;
-		image->load(it->c_str());
-		image->load_texture();
-
-		auto pred = [&](std::unique_ptr<Photo>& photo) { return photo->filename == name + name_suffix.str(); };
-
-		while (std::find_if(photos.begin(), photos.end(), pred) != photos.end()) {
-			name_suffix.str("");
-			name_suffix << " (" << name_suffix_i++ << ")";
-		}
-
-		Image *origImage = new Image(image->width, image->height, image->channels);
-		memcpy(origImage->data, image->data, image->width * image->height * image->channels);
-
-		std::unique_ptr<Photo> photo = std::make_unique<Photo>();
-		photo->image = image;
-		photo->origImage = origImage;
-		photo->filename = name + name_suffix.str();
-		photo->filepath = *it;
-		photos.push_back(std::move(photo));
+		std::string filepath = *it;
+		add_photo(filepath);
 	}
 }
 
@@ -219,7 +183,8 @@ InputRequest Application::handle_input() {
 					open_file_dialog();
 				} else if (event.key.keysym.sym == SDLK_w) {
 					photos.erase(photos.begin() + m_selectedPhotoIndex);
-					if (m_selectedPhotoIndex > 0) m_selectedPhotoIndex -= 1;
+					if (m_selectedPhotoIndex > 0)
+						m_selectedPhotoIndex -= 1;
 				} else if (event.key.keysym.mod & KMOD_SHIFT && (event.key.keysym.sym == SDLK_s)) {
 					return InputRequest(InputRequest_SaveAs);
 				} else if (event.key.keysym.sym == SDLK_s) {

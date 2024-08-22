@@ -1,16 +1,21 @@
 #include "Image.hpp"
-#include "Commands.hpp"
+
+#include <cstring>
 
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
 #define STB_IMAGE_WRITE_IMPLEMENTATION
-#include <SDL_opengl.h>
+#include <SDL2/SDL_opengl.h>
 #include <stb_image_write.h>
 
 using namespace ayin;
 
 Image::Image(int width, int height, int channels) : width(width), height(height), channels(channels) {
 	data = (unsigned char *)malloc(width * height * channels);
+}
+
+Image::Image(const Image &image) : Image(image.width, image.height, image.channels) {
+	memcpy(data, image.data, width * height * channels);
 }
 
 Image::~Image() {
@@ -31,6 +36,10 @@ bool Image::load(const char *filename) {
 	}
 	data = stbi_load(filename, &width, &height, &channels, 0);
 	return data != nullptr;
+}
+
+void Image::clear() {
+	std::memset(data, 0, width * height * channels);
 }
 
 bool Image::save(const char *filename) {
