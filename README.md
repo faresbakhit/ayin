@@ -1,13 +1,18 @@
-# Ayin
+# Ayin – Photo Editing Software
 
-![](./.github/ayin.png)
+![Ayin interface showcase](./misc/readme/ayin.png)
+
+Ayin (عَيْن, [\[ʕajn\]](https://en.wikipedia.org/wiki/Help:IPA/Arabic)), Arabic for "eye", is a free and open-source photo editing software I developed in part of a contest in my first year at FCAI-CU and got 1st place in the solo competition. Ayin is very simplistic compared to big corporate software™ but it has some cool [features](#features) and gets the job done in terms of functionality implemented. Talking of features, when I showcased Ayin, the device theme feature despite being the simplest, got the most applause. It's always the little things that make good software!
+
+![Photo of a framer with the text 'it ain't much' on top, and the text 'but it's honest work' on the bottom.](./misc/readme/honest-work.jpg)
 
 ## Features
 
+- [x] 21+ Filters
 - [x] Multiple image tabs
-- [x] Undo, and redo stack
-- [x] Follow device theme (Works on Win32)
-
+- [x] Undo and redo stack
+- [x] Follow device theme
+ 
 ## Build on Windows/MinGW-w64
 
 1. Install [MSYS2](https://www.msys2.org/)
@@ -27,8 +32,10 @@ $ ./target/release/ayin.exe
 
 1. Ctrl+Shift+P
 2. Preferences: Open User Settings (JSON)
-3. Copy this inside of your `settings.json`
-```json
+3. Copy this to of your `settings.json`
+```jsonc
+{
+    // ...
     "terminal.integrated.profiles.windows": {
         "MSYS2 UCRT": {
             "path": "cmd.exe",
@@ -38,4 +45,6 @@ $ ./target/release/ayin.exe
             ]
         }
     }
+    // ...
+}
 ```
