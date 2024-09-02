@@ -2,7 +2,7 @@
 
 ![Ayin interface showcase](./misc/readme/ayin.png)
 
-Ayin (عَيْن, [\[ʕajn\]](https://en.wikipedia.org/wiki/Help:IPA/Arabic)), Arabic for "eye", is a free and open-source photo editing software I developed in part of a contest in my first year at FCAI-CU and got 1st place in the solo competition. Ayin is very simplistic compared to big corporate software™ but it has some cool [features](#features) and gets the job done in terms of functionality implemented. Talking of features, when I showcased Ayin, the device theme feature despite being the simplest, got the most applause. It's always the little things that make good software!
+Ayin (عَيْن, [\[ʕajn\]](https://en.wikipedia.org/wiki/Help:IPA/Arabic)), Arabic for "eye", is a free and open-source photo editing software I developed in part of a contest in my first year at FCAI-CU and got 1st place in the solo competition. Ayin is very simplistic compared to big corporate software™ but it has some cool [features](#features) and gets the job done in terms of functionality implemented. A pre-compiled version for Windows is available in the [releases](https://github.com/faresbakhit/ayin/releases/) page, but I urge you to compile it yourself and hack your own version of Ayin with your own patches.
 
 ![Photo of a framer with the text 'it ain't much' on top, and the text 'but it's honest work' on the bottom.](./misc/readme/honest-work.jpg)
 
