@@ -1,0 +1,57 @@
+{
+  "version": 10,
+  "$comment": "TODO: VCPKG_OVERLAY_TRIPLETS",
+  "configurePresets": [
+    {
+      "hidden": true,
+      "name": "base",
+      "displayName": "Default Config",
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/build",
+      "cacheVariables": {
+        "CMAKE_TOOLCHAIN_FILE": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake"
+      }
+    },
+    {
+      "name": "debug",
+      "inherits": "base",
+      "displayName": "Debug Config",
+      "description": "Debug Unix build",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug"
+      }
+    },
+    {
+      "name": "release",
+      "inherits": "base",
+      "displayName": "Release Config",
+      "description": "Release Unix build",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "RelWithDebInfo"
+      }
+    }
+  ],
+  "buildPresets": [
+    {
+      "hidden": true,
+      "name": "base",
+      "targets": [
+        "all"
+      ]
+    },
+    {
+      "name": "debug",
+      "inherits": "base",
+      "configurePreset": "debug",
+      "displayName": "Debug Build",
+      "description": "Build the project in debug on Unix"
+    },
+    {
+      "name": "release",
+      "inherits": "base",
+      "configurePreset": "release",
+      "displayName": "Release Build",
+      "description": "Build the project in release on Unix"
+    }
+  ]
+}

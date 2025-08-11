@@ -1,0 +1,5 @@
+# CMake
+CMakeUserPresets.json
+build/
+# clangd
+.cache/
