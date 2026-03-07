@@ -1,7 +1,7 @@
 mode = debug
 
 CXXFLAGS = -Ilib/imgui -Ilib/imgui/backends -Ilib/imgui/misc/freetype -Ilib/portable-file-dialogs -Ilib/stb
-CXXFLAGS += -std=c++17 -Wall -Wextra -Wno-missing-field-initializers -Wno-missing-braces
+CXXFLAGS += -std=c++17
 
 ifeq ($(mode),debug)
  BUILDDIR = target/debug
@@ -60,7 +60,7 @@ $(BUILDDIR):
 	mkdir -p $(BUILDDIR)/internal $(BUILDDIR)/external
 
 $(BUILDDIR)/internal/%.o:src/%.cpp|$(BUILDDIR)
-	$(CXX) -c -o $@ $< $(CXXFLAGS)
+	$(CXX) -c -o $@ $< $(CXXFLAGS) -Wall
 
 ifeq ($(OS),Windows_NT)
 $(BUILDDIR)/internal/icon.o:misc/icon/icon.rc

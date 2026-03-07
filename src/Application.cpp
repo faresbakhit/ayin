@@ -10,6 +10,7 @@
 #include <filesystem>
 #include <stdexcept>
 
+#define PFD_SKIP_IMPLEMENTATION 1
 #include <portable-file-dialogs.hpp>
 
 using namespace ayin;
@@ -143,7 +144,7 @@ void Application::set_selected_photo(size_t index) {
 }
 
 void Application::open_file_dialog() {
-	auto selection = pfd::OpenFile("Open", "", pfdImageFile, pfd::Option::multiselect).result();
+	auto selection = pfd::open_file("Open", "", pfdImageFile, pfd::opt::multiselect).result();
 	for (auto it = selection.begin(); it != selection.end(); ++it) {
 		std::string filepath = *it;
 		add_photo(filepath);
@@ -151,12 +152,12 @@ void Application::open_file_dialog() {
 }
 
 void Application::save_file_dialog(Photo &photo) {
-	auto selection = pfd::SaveFile("Save As...", "", pfdImageFile, pfd::Option::none).result();
+	auto selection = pfd::save_file("Save As...", "", pfdImageFile, pfd::opt::none).result();
 	if (selection.empty()) {
 		return;
 	}
 	if (photo.image->save(selection.c_str())) {
-		pfd::Notify("Error: Save", "An error happened", pfd::Icon::error);
+		pfd::notify("Error: Save", "An error happened", pfd::icon::error);
 	}
 }
 

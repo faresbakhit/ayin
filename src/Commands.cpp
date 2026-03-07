@@ -3,6 +3,7 @@
 #include "ImageFilter.hpp"
 
 #include <imgui.h>
+#define PFD_SKIP_IMPLEMENTATION 1
 #include <portable-file-dialogs.hpp>
 
 using namespace ayin::Commands;
@@ -49,7 +50,7 @@ void Invert::setImage(Image &image) {
 Info Invert::getInfo() { return Info(Type_Invert); }
 
 void Merge::setImage(Image &image) {
-	auto selection = pfd::OpenFile("Open", "", pfdImageFile, pfd::Option::multiselect).result();
+	auto selection = pfd::open_file("Open", "", pfdImageFile, pfd::opt::multiselect).result();
 
 	if (selection.empty()) {
 		done = true;
