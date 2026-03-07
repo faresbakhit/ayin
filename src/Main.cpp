@@ -95,11 +95,11 @@ int main(int argc, char *argv[]) try {
 									(content_region.y - photo->image->height * photo->zoom) * 0.5f));
 							if (cmd && cmd->tmpImage) {
 								ImGui::Image(
-									(void *)(intptr_t)cmd->tmpImage->texture,
+									ImTextureRef(ImTextureID(cmd->tmpImage->texture)),
 									ImVec2(cmd->tmpImage->width * photo->zoom, cmd->tmpImage->height * photo->zoom));
 							} else {
 								ImGui::Image(
-									(void *)(intptr_t)photo->image->texture,
+									ImTextureRef(ImTextureID(photo->image->texture)),
 									ImVec2(photo->image->width * photo->zoom, photo->image->height * photo->zoom));
 							}
 						}
